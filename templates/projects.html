@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Projects | Sahil Ravate</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Sahil Ravate
+        </div>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="{{ url_for('index') }}">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('index') }}#about">
+                    About
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('index') }}#skills">
+                    Skills
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('projects') }}">
+                    Projects
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('contact') }}">
+                    Contact
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+    <section class="page-section">
+
+        <h1 class="section-title">
+            My Projects
+        </h1>
+
+        <div class="projects-container">
+
+            {% for project in projects %}
+
+            <div class="project-card">
+
+                <h2>
+                    {{ project["title"] }}
+                </h2>
+
+                <p>
+                    {{ project["description"] }}
+                </p>
+
+                <p>
+                    <strong>Technologies:</strong>
+                    {{ project["technologies"] }}
+                </p>
+
+                {% if project["github"] %}
+
+                <a href="{{ project['github'] }}"
+                   target="_blank"
+                   class="btn">
+
+                    View on GitHub
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        <p>
+            © 2026 Sahil Ravate
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

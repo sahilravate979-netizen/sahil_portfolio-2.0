@@ -1,0 +1,730 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #ffffff;
+    line-height: 1.6;
+
+    /* Interesting background */
+    background:
+        radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.35), transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.35), transparent 30%),
+        linear-gradient(135deg, #020617, #0f172a, #111827);
+
+    min-height: 100vh;
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    width: 100%;
+    background: rgba(2, 6, 23, 0.85);
+
+    backdrop-filter: blur(12px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 8%;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+
+    background: linear-gradient(
+        90deg,
+        #60a5fa,
+        #a78bfa
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: #e2e8f0;
+    text-decoration: none;
+    font-weight: 500;
+
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #60a5fa;
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    min-height: 90vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 80px 20px;
+
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 20% 30%,
+            rgba(37, 99, 235, 0.25),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 80% 70%,
+            rgba(139, 92, 246, 0.25),
+            transparent 35%
+        );
+}
+
+
+/* Glowing background circles */
+
+.hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    background: #2563eb;
+
+    border-radius: 50%;
+
+    filter: blur(120px);
+
+    opacity: 0.25;
+
+    top: 10%;
+    left: 5%;
+
+    animation: float 6s infinite alternate;
+}
+
+.hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    background: #9333ea;
+
+    border-radius: 50%;
+
+    filter: blur(120px);
+
+    opacity: 0.25;
+
+    bottom: 5%;
+    right: 5%;
+
+    animation: float 7s infinite alternate-reverse;
+}
+
+
+.hero-content {
+    max-width: 850px;
+
+    position: relative;
+    z-index: 2;
+}
+
+.hello {
+    color: #60a5fa;
+
+    font-size: 22px;
+
+    font-weight: bold;
+}
+
+.hero h1 {
+    font-size: 65px;
+
+    margin: 10px 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            #60a5fa,
+            #a78bfa,
+            #c084fc
+        );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero h2 {
+    color: #e2e8f0;
+
+    margin-bottom: 20px;
+
+    font-size: 28px;
+}
+
+.hero p {
+    color: #cbd5e1;
+
+    font-size: 18px;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.hero-buttons {
+    margin-top: 30px;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 15px;
+}
+
+.btn {
+    display: inline-block;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        );
+
+    color: white;
+
+    padding: 13px 28px;
+
+    border-radius: 10px;
+
+    text-decoration: none;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+
+    box-shadow:
+        0 10px 25px rgba(37, 99, 235, 0.3);
+}
+
+.btn:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 15px 35px rgba(124, 58, 237, 0.4);
+}
+
+.btn.outline {
+    background: transparent;
+
+    border: 2px solid #60a5fa;
+
+    color: #60a5fa;
+
+    box-shadow: none;
+}
+
+.btn.outline:hover {
+    background: #2563eb;
+
+    color: white;
+}
+
+
+/* =========================
+   SECTIONS
+========================= */
+
+.section {
+    padding: 90px 8%;
+
+    background:
+        rgba(15, 23, 42, 0.65);
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.05);
+}
+
+.section-title {
+    text-align: center;
+
+    font-size: 38px;
+
+    margin-bottom: 45px;
+
+    color: white;
+}
+
+.section-title::after {
+    content: "";
+
+    display: block;
+
+    width: 70px;
+
+    height: 4px;
+
+    margin: 12px auto;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #2563eb,
+            #a855f7
+        );
+}
+
+
+/* =========================
+   ABOUT
+========================= */
+
+.about-content {
+    max-width: 800px;
+
+    margin: auto;
+
+    text-align: center;
+
+    font-size: 18px;
+
+    color: #cbd5e1;
+}
+
+.about-content p {
+    margin-bottom: 15px;
+}
+
+
+/* =========================
+   SKILLS
+========================= */
+
+.skills-section {
+    background:
+        linear-gradient(
+            135deg,
+            #0f172a,
+            #172554
+        );
+}
+
+.skills-container {
+    max-width: 1000px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 20px;
+}
+
+.skill-card {
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    padding: 25px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.1);
+
+    backdrop-filter: blur(10px);
+
+    transition: 0.3s;
+}
+
+.skill-card:hover {
+    transform: translateY(-8px);
+
+    border-color: #60a5fa;
+
+    box-shadow:
+        0 10px 30px rgba(37, 99, 235, 0.2);
+}
+
+.skill-card h3 {
+    color: #60a5fa;
+
+    margin-bottom: 5px;
+}
+
+.skill-card p {
+    color: #94a3b8;
+}
+
+
+/* =========================
+   PROJECTS
+========================= */
+
+.projects-container {
+    max-width: 1100px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+
+    gap: 25px;
+}
+
+.project-card {
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    padding: 30px;
+
+    border-radius: 15px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.1);
+
+    backdrop-filter: blur(10px);
+
+    transition: 0.3s;
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+
+    border-color: #7c3aed;
+
+    box-shadow:
+        0 15px 35px rgba(124, 58, 237, 0.2);
+}
+
+.project-card h3,
+.project-card h2 {
+    color: #ffffff;
+
+    margin-bottom: 15px;
+}
+
+.project-card p {
+    color: #cbd5e1;
+
+    margin-bottom: 15px;
+}
+
+.technology {
+    background:
+        rgba(37, 99, 235, 0.15);
+
+    color: #60a5fa;
+
+    padding: 8px;
+
+    border-radius: 7px;
+
+    margin-bottom: 15px;
+
+    font-size: 14px;
+}
+
+.project-link {
+    color: #60a5fa;
+
+    font-weight: bold;
+
+    text-decoration: none;
+}
+
+.project-link:hover {
+    color: #a78bfa;
+}
+
+
+/* =========================
+   CONTACT
+========================= */
+
+.contact-section {
+    text-align: center;
+
+    padding: 90px 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #172554,
+            #3b0764
+        );
+}
+
+.contact-section h2 {
+    font-size: 38px;
+
+    margin-bottom: 10px;
+}
+
+.contact-section p {
+    color: #cbd5e1;
+
+    margin-bottom: 25px;
+}
+
+
+/* =========================
+   CONTACT PAGE
+========================= */
+
+.contact-page {
+    min-height: 80vh;
+
+    padding: 70px 20px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+.contact-box {
+    width: 100%;
+
+    max-width: 650px;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    padding: 40px;
+
+    border-radius: 15px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.1);
+
+    backdrop-filter: blur(15px);
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.contact-box h1 {
+    text-align: center;
+
+    margin-bottom: 10px;
+}
+
+.contact-box > p {
+    text-align: center;
+
+    color: #cbd5e1;
+
+    margin-bottom: 25px;
+}
+
+form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+form label {
+    color: #e2e8f0;
+
+    font-weight: bold;
+}
+
+input,
+textarea {
+    width: 100%;
+
+    padding: 13px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.15);
+
+    border-radius: 8px;
+
+    font-size: 16px;
+
+    background:
+        rgba(15, 23, 42, 0.8);
+
+    color: white;
+
+    margin-bottom: 10px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+
+    border-color: #60a5fa;
+
+    box-shadow:
+        0 0 10px rgba(96, 165, 250, 0.2);
+}
+
+.message {
+    background: rgba(34, 197, 94, 0.15);
+
+    color: #86efac;
+
+    padding: 12px;
+
+    border-radius: 7px;
+
+    margin: 20px 0;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    text-align: center;
+
+    padding: 25px;
+
+    background: #020617;
+
+    color: #94a3b8;
+}
+
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes float {
+
+    from {
+        transform: translateY(0px);
+    }
+
+    to {
+        transform: translateY(40px);
+    }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+.menu-button {
+    display: none;
+
+    font-size: 28px;
+
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+
+    .nav-links {
+        display: none;
+
+        position: absolute;
+
+        top: 65px;
+
+        left: 0;
+
+        width: 100%;
+
+        background: #020617;
+
+        flex-direction: column;
+
+        padding: 20px;
+
+        text-align: center;
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .menu-button {
+        display: block;
+    }
+
+    .hero h1 {
+        font-size: 45px;
+    }
+
+    .hero h2 {
+        font-size: 22px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+
+        align-items: center;
+    }
+
+    .section {
+        padding: 60px 5%;
+    }
+
+    .contact-box {
+        padding: 25px;
+    }
+}
