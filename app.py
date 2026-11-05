@@ -1,131 +1,188 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+
+from pathlib import Path
 import sqlite3
 
+from flask import Flask, render_template, request, redirect, url_for, flash
+
+# --------------------------------------------------
+# APPLICATION CONFIGURATION
+# --------------------------------------------------
+
+BASE_DIR = Path(__file__).resolve().parent
+DATABASE = BASE_DIR / "portfolio.db"
+
 app = Flask(__name__)
-app.secret_key = "portfolio_secret_key"
-
-DATABASE = "portfolio.db"
+app.secret_key = "sahil_portfolio_secret_key_2026"
 
 
-# -----------------------------
-# Database Connection
-# -----------------------------
+# --------------------------------------------------
+# DEFAULT PORTFOLIO DATA
+# --------------------------------------------------
+
+DEFAULT_PROJECTS = [
+    (
+        "College Event Resource Allocation",
+        "A web application to manage college events, resources, and task allocation.",
+        "Python, Flask, SQLite, HTML, CSS, JavaScript",
+        "https://github.com/sahilravate979-netizen/college-event-resource-allocation"
+    ),
+    (
+        "Task Management Application",
+        "A task management platform with user authentication, task tracking, and admin features.",
+        "Python, Flask, SQLite, HTML, CSS, JavaScript",
+        "https://github.com/sahilravate979-netizen/task-management-application"
+    ),
+    (
+        "E-Commerce Web Application",
+        "An online shopping platform with product management, cart, checkout, and admin dashboard.",
+        "PHP, MySQL, HTML, CSS, JavaScript",
+        "https://github.com/sahilravate979-netizen/ecommerce-web-application"
+    ),
+    (
+        "Blog Platform with Comments",
+        "A blogging platform where users can publish posts and interact through comments.",
+        "Python, Flask, SQLite, HTML, CSS, JavaScript",
+        "https://github.com/sahilravate979-netizen/blog-platform-with-comments"
+    ),
+    (
+        "EV Incentive Vehicle",
+        "A web application for exploring electric vehicle incentives and related information.",
+        "Python, Flask, SQLite, HTML, CSS, JavaScript",
+        "https://github.com/sahilravate979-netizen/ev-incentive-vehicle"
+    ),
+    (
+        "Desktop Expenses Tracker",
+        "A desktop application to record expenses and visualize spending through charts.",
+        "Python, Tkinter, SQLite, Matplotlib",
+        "https://github.com/sahilravate979-netizen"
+    )
+]
+
+DEFAULT_SKILLS = [
+    ("Python", "Programming"),
+    ("Java", "Programming"),
+    ("PHP", "Programming"),
+    ("HTML", "Web Development"),
+    ("CSS", "Web Development"),
+    ("JavaScript", "Web Development"),
+    ("Flask", "Frameworks"),
+    ("MySQL", "Database"),
+    ("SQLite", "Database"),
+    ("Git & GitHub", "Tools"),
+    ("Machine Learning", "AI & ML"),
+    ("Tkinter", "Frameworks")
+]
+
+
+# --------------------------------------------------
+# DATABASE CONNECTION
+# --------------------------------------------------
+
 def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+    connection = sqlite3.connect(DATABASE)
+    connection.row_factory = sqlite3.Row
+    return connection
 
 
-# -----------------------------
-# Initialize Database
-# -----------------------------
+# --------------------------------------------------
+# INITIALIZE DATABASE
+# --------------------------------------------------
+
 def init_db():
-    conn = get_db_connection()
+    connection = get_db_connection()
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS projects (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            technologies TEXT NOT NULL,
-            github TEXT
-        )
-    """)
+    try:
+        cursor = connection.cursor()
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS skills (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL
-        )
-    """)
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            message TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # Add sample projects only if table is empty
-    project_count = conn.execute(
-        "SELECT COUNT(*) FROM projects"
-    ).fetchone()[0]
-
-    if project_count == 0:
-        projects = [
-            (
-                "Personal Portfolio Website",
-                "A full-stack personal portfolio website to showcase projects and skills.",
-                "HTML, CSS, JavaScript, Flask, SQLite",
-                "https://github.com/"
-            ),
-            (
-                "EV Incentive Vehicle Website",
-                "A website that educates users about government incentives and rebates for electric vehicle purchases.",
-                "HTML, CSS, JavaScript, Flask, SQLite",
-                "https://github.com/"
-            ),
-            (
-                "Expense Tracker",
-                "Desktop application for managing and analyzing personal expenses.",
-                "Python, Tkinter, SQLite, Matplotlib",
-                "https://github.com/"
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS projects (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT,
+                technologies TEXT,
+                github TEXT
             )
-        ]
+        """)
 
-        conn.executemany("""
-            INSERT INTO projects
-            (title, description, technologies, github)
-            VALUES (?, ?, ?, ?)
-        """, projects)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS skills (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                category TEXT
+            )
+        """)
 
-    # Add sample skills
-    skill_count = conn.execute(
-        "SELECT COUNT(*) FROM skills"
-    ).fetchone()[0]
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
-    if skill_count == 0:
-        skills = [
-            ("HTML", "Frontend"),
-            ("CSS", "Frontend"),
-            ("JavaScript", "Frontend"),
-            ("Python", "Backend"),
-            ("Flask", "Backend"),
-            ("SQLite", "Database"),
-            ("Git & GitHub", "Tools")
-        ]
+        # Remove duplicate projects with the same title.
+        # Keeps the project with the lowest ID.
+        cursor.execute("""
+            DELETE FROM projects
+            WHERE id NOT IN (
+                SELECT MIN(id)
+                FROM projects
+                GROUP BY LOWER(TRIM(title))
+            )
+        """)
 
-        conn.executemany("""
-            INSERT INTO skills (name, category)
-            VALUES (?, ?)
-        """, skills)
+        # Add default projects only if the projects table is empty.
+        cursor.execute("SELECT COUNT(*) FROM projects")
+        project_count = cursor.fetchone()[0]
 
-    conn.commit()
-    conn.close()
+        if project_count == 0:
+            cursor.executemany("""
+                INSERT INTO projects
+                (title, description, technologies, github)
+                VALUES (?, ?, ?, ?)
+            """, DEFAULT_PROJECTS)
+
+        # Add default skills only if the skills table is empty.
+        cursor.execute("SELECT COUNT(*) FROM skills")
+        skill_count = cursor.fetchone()[0]
+
+        if skill_count == 0:
+            cursor.executemany("""
+                INSERT INTO skills (name, category)
+                VALUES (?, ?)
+            """, DEFAULT_SKILLS)
+
+        connection.commit()
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
 
 
-# -----------------------------
-# Home Page
-# -----------------------------
+# --------------------------------------------------
+# HOME PAGE
+# --------------------------------------------------
+
 @app.route("/")
 def index():
-    conn = get_db_connection()
+    connection = get_db_connection()
 
-    projects = conn.execute("""
-        SELECT * FROM projects
-        ORDER BY id DESC
-    """).fetchall()
+    try:
+        projects = connection.execute("""
+            SELECT * FROM projects ORDER BY id ASC
+        """).fetchall()
 
-    skills = conn.execute("""
-        SELECT * FROM skills
-        ORDER BY category, name
-    """).fetchall()
+        skills = connection.execute("""
+            SELECT * FROM skills ORDER BY category, name
+        """).fetchall()
 
-    conn.close()
+    finally:
+        connection.close()
 
     return render_template(
         "index.html",
@@ -134,67 +191,62 @@ def index():
     )
 
 
-# -----------------------------
-# Projects Page
-# -----------------------------
-@app.route("/projects")
-def projects():
-    conn = get_db_connection()
+# --------------------------------------------------
+# CONTACT FORM
+# --------------------------------------------------
 
-    projects = conn.execute("""
-        SELECT * FROM projects
-        ORDER BY id DESC
-    """).fetchall()
-
-    conn.close()
-
-    return render_template(
-        "projects.html",
-        projects=projects
-    )
-
-
-# -----------------------------
-# Contact Page
-# -----------------------------
-@app.route("/contact", methods=["GET", "POST"])
+@app.route("/contact", methods=["POST"])
 def contact():
+    name = request.form.get("name", "").strip()
+    email = request.form.get("email", "").strip()
+    message = request.form.get("message", "").strip()
 
-    if request.method == "POST":
+    if not name or not email or not message:
+        flash("Please fill in all the contact form fields.", "error")
+        return redirect(url_for("index") + "#contact")
 
-        name = request.form["name"].strip()
-        email = request.form["email"].strip()
-        message = request.form["message"].strip()
+    if "@" not in email or "." not in email:
+        flash("Please enter a valid email address.", "error")
+        return redirect(url_for("index") + "#contact")
 
-        if not name or not email or not message:
-            flash("Please fill all fields.")
-            return redirect(url_for("contact"))
+    connection = get_db_connection()
 
-        conn = get_db_connection()
-
-        conn.execute("""
-            INSERT INTO messages
-            (name, email, message)
+    try:
+        connection.execute("""
+            INSERT INTO messages (name, email, message)
             VALUES (?, ?, ?)
         """, (name, email, message))
 
-        conn.commit()
-        conn.close()
+        connection.commit()
+        flash("Thank you! Your message has been submitted successfully.", "success")
 
-        flash("Your message has been sent successfully!")
+    except sqlite3.Error:
+        connection.rollback()
+        flash("Sorry, something went wrong. Please try again.", "error")
 
-        return redirect(url_for("contact"))
+    finally:
+        connection.close()
 
-    return render_template("contact.html")
+    return redirect(url_for("index") + "#contact")
 
 
-# -----------------------------
-# Run Application
-# -----------------------------
+# --------------------------------------------------
+# CUSTOM 404 PAGE
+# --------------------------------------------------
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return redirect(url_for("index"))
+
+
+# --------------------------------------------------
+# START APPLICATION
+# --------------------------------------------------
+
 if __name__ == "__main__":
     init_db()
 
-    print("Database initialized successfully.")
-    print("Starting Personal Portfolio Website...")
+    print("Portfolio application is starting...")
+    print("Open http://127.0.0.1:5000 in your browser.")
 
     app.run(debug=True)

@@ -1,119 +1,160 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Projects | Sahil Ravate</title>
+    <title>My Projects | Sahil Ravate</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 
 <body>
 
+    <!-- Navigation -->
     <nav class="navbar">
+        <div class="nav-container">
 
-        <div class="logo">
-            Sahil Ravate
+            <a href="{{ url_for('index') }}" class="logo">
+                SAHIL<span>.</span>
+            </a>
+
+            <button class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('index') }}#about">About</a></li>
+                <li><a href="{{ url_for('index') }}#skills">Skills</a></li>
+                <li><a href="{{ url_for('projects') }}">Projects</a></li>
+                <li><a href="{{ url_for('contact') }}" class="nav-btn">Contact</a></li>
+            </ul>
+
         </div>
-
-        <ul class="nav-links">
-
-            <li>
-                <a href="{{ url_for('index') }}">
-                    Home
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('index') }}#about">
-                    About
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('index') }}#skills">
-                    Skills
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('projects') }}">
-                    Projects
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('contact') }}">
-                    Contact
-                </a>
-            </li>
-
-        </ul>
-
     </nav>
 
+    <!-- Projects Hero -->
+    <section class="hero" style="min-height: 400px;">
+        <div class="container" style="text-align: center; position: relative; z-index: 1;">
 
-    <section class="page-section">
+            <span class="hero-tag">MY WORK & PORTFOLIO</span>
 
-        <h1 class="section-title">
-            My Projects
-        </h1>
+            <h1>
+                My <span>Projects</span>
+            </h1>
 
-        <div class="projects-container">
+            <p class="hero-description" style="margin: 20px auto;">
+                Explore my development journey through web applications,
+                Python projects, AI and machine learning experiments.
+            </p>
 
-            {% for project in projects %}
+            <a href="{{ url_for('index') }}" class="btn btn-outline">
+                ← Back to Home
+            </a>
 
-            <div class="project-card">
+        </div>
+    </section>
 
-                <h2>
-                    {{ project["title"] }}
-                </h2>
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="container">
 
-                <p>
-                    {{ project["description"] }}
-                </p>
+            <div class="section-heading">
+                <span>WHAT I HAVE BUILT</span>
+                <h2>Featured Projects</h2>
+                <p>Some of my practical development work.</p>
+            </div>
 
-                <p>
-                    <strong>Technologies:</strong>
-                    {{ project["technologies"] }}
-                </p>
+            <div class="projects-grid">
 
-                {% if project["github"] %}
+                {% for project in projects %}
 
-                <a href="{{ project['github'] }}"
-                   target="_blank"
-                   class="btn">
+                <div class="project-card">
 
-                    View on GitHub
+                    <div class="project-number">
+                        PROJECT {{ "%02d" | format(loop.index) }}
+                    </div>
 
-                </a>
+                    <h3>{{ project.title }}</h3>
 
-                {% endif %}
+                    <p>{{ project.description }}</p>
+
+                    {% if project.technologies %}
+                    <div class="project-tech">
+                        {% for tech in project.technologies.split(',') %}
+                        <span>{{ tech.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="project-link">
+                        View on GitHub ↗
+                    </a>
+                    {% endif %}
+
+                </div>
+
+                {% else %}
+
+                <div class="project-card">
+                    <h3>Projects coming soon</h3>
+                    <p>My projects will be displayed here.</p>
+                </div>
+
+                {% endfor %}
 
             </div>
 
-            {% endfor %}
-
         </div>
-
     </section>
 
+    <!-- Call to Action -->
+    <section class="ai-section">
+        <div class="container">
 
-    <footer>
+            <div class="ai-card">
 
-        <p>
-            © 2026 Sahil Ravate
-        </p>
+                <h2>Have a Project Idea?</h2>
 
+                <p>
+                    I am interested in building creative web applications,
+                    Python projects and AI-powered solutions.
+                    Let's connect and build something amazing.
+                </p>
+
+                <div style="margin-top: 25px;">
+                    <a href="{{ url_for('contact') }}"
+                       class="btn btn-primary">
+                        Contact Me →
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>
+                © <span id="currentYear">2026</span>
+                Sahil Ravate. All Rights Reserved.
+            </p>
+        </div>
     </footer>
 
-</body>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
+</body>
 </html>
