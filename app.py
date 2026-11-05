@@ -1,8 +1,10 @@
 
 from pathlib import Path
+import os
 import sqlite3
 
 from flask import Flask, render_template, request, redirect, url_for, flash
+
 
 # --------------------------------------------------
 # APPLICATION CONFIGURATION
@@ -12,11 +14,15 @@ BASE_DIR = Path(__file__).resolve().parent
 DATABASE = BASE_DIR / "portfolio.db"
 
 app = Flask(__name__)
-app.secret_key = "sahil_portfolio_secret_key_2026"
+
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "sahil_portfolio_secret_key_2026"
+)
 
 
 # --------------------------------------------------
-# DEFAULT PORTFOLIO DATA
+# DEFAULT PORTFOLIO PROJECTS
 # --------------------------------------------------
 
 DEFAULT_PROJECTS = [
@@ -58,6 +64,11 @@ DEFAULT_PROJECTS = [
     )
 ]
 
+
+# --------------------------------------------------
+# DEFAULT SKILLS
+# --------------------------------------------------
+
 DEFAULT_SKILLS = [
     ("Python", "Programming"),
     ("Java", "Programming"),
@@ -85,15 +96,17 @@ def get_db_connection():
 
 
 # --------------------------------------------------
-# INITIALIZE DATABASE
+# DATABASE INITIALIZATION
 # --------------------------------------------------
 
 def init_db():
+
     connection = get_db_connection()
 
     try:
         cursor = connection.cursor()
 
+        # Projects table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS projects (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,6 +117,7 @@ def init_db():
             )
         """)
 
+        # Skills table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS skills (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -112,6 +126,7 @@ def init_db():
             )
         """)
 
+        # Contact messages table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -122,8 +137,7 @@ def init_db():
             )
         """)
 
-        # Remove duplicate projects with the same title.
-        # Keeps the project with the lowest ID.
+        # Remove duplicate projects while keeping the lowest ID
         cursor.execute("""
             DELETE FROM projects
             WHERE id NOT IN (
@@ -133,7 +147,7 @@ def init_db():
             )
         """)
 
-        # Add default projects only if the projects table is empty.
+        # Insert default projects only if the table is empty
         cursor.execute("SELECT COUNT(*) FROM projects")
         project_count = cursor.fetchone()[0]
 
@@ -144,7 +158,7 @@ def init_db():
                 VALUES (?, ?, ?, ?)
             """, DEFAULT_PROJECTS)
 
-        # Add default skills only if the skills table is empty.
+        # Insert default skills only if the table is empty
         cursor.execute("SELECT COUNT(*) FROM skills")
         skill_count = cursor.fetchone()[0]
 
@@ -164,21 +178,31 @@ def init_db():
         connection.close()
 
 
+# IMPORTANT:
+# Initialize the database when the application is imported.
+# This allows Gunicorn on Render to initialize the database.
+
+init_db()
+
+
 # --------------------------------------------------
 # HOME PAGE
 # --------------------------------------------------
 
 @app.route("/")
 def index():
+
     connection = get_db_connection()
 
     try:
         projects = connection.execute("""
-            SELECT * FROM projects ORDER BY id ASC
+            SELECT * FROM projects
+            ORDER BY id ASC
         """).fetchall()
 
         skills = connection.execute("""
-            SELECT * FROM skills ORDER BY category, name
+            SELECT * FROM skills
+            ORDER BY category, name
         """).fetchall()
 
     finally:
@@ -197,16 +221,25 @@ def index():
 
 @app.route("/contact", methods=["POST"])
 def contact():
+
     name = request.form.get("name", "").strip()
     email = request.form.get("email", "").strip()
     message = request.form.get("message", "").strip()
 
+    # Validate empty fields
     if not name or not email or not message:
-        flash("Please fill in all the contact form fields.", "error")
+        flash(
+            "Please fill in all the contact form fields.",
+            "error"
+        )
         return redirect(url_for("index") + "#contact")
 
+    # Basic email validation
     if "@" not in email or "." not in email:
-        flash("Please enter a valid email address.", "error")
+        flash(
+            "Please enter a valid email address.",
+            "error"
+        )
         return redirect(url_for("index") + "#contact")
 
     connection = get_db_connection()
@@ -218,11 +251,19 @@ def contact():
         """, (name, email, message))
 
         connection.commit()
-        flash("Thank you! Your message has been submitted successfully.", "success")
+
+        flash(
+            "Thank you! Your message has been submitted successfully.",
+            "success"
+        )
 
     except sqlite3.Error:
         connection.rollback()
-        flash("Sorry, something went wrong. Please try again.", "error")
+
+        flash(
+            "Sorry, something went wrong. Please try again.",
+            "error"
+        )
 
     finally:
         connection.close()
@@ -244,7 +285,6 @@ def page_not_found(error):
 # --------------------------------------------------
 
 if __name__ == "__main__":
-    init_db()
 
     print("Portfolio application is starting...")
     print("Open http://127.0.0.1:5000 in your browser.")
